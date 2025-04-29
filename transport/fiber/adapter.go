@@ -90,6 +90,27 @@ func (r *FiberRequest) ReadData(data any) error {
 	return r.readData(r, data)
 }
 
+func (r *FiberRequest) SetCookie(c transport.Cookie) error {
+	r.ctx.Cookie(&fiber.Cookie{
+		Name:        c.Name,
+		Value:       c.Value,
+		Path:        c.Path,
+		Domain:      c.Domain,
+		SameSite:    convertSameSite(c.SameSite),
+		Expires:     c.Expires,
+		MaxAge:      c.MaxAge,
+		Secure:      c.Secure,
+		HTTPOnly:    c.HttpOnly,
+		Partitioned: c.Partitioned,
+	})
+
+	return nil
+}
+
+func (r *FiberRequest) Cookie(name string) (string, error) {
+	return r.ctx.Cookies(name), nil
+}
+
 // FiberResponse адаптер для fiber.Ctx
 type FiberResponse struct {
 	ctx           fiber.Ctx

@@ -8,10 +8,33 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/url"
+	"time"
 
 	"github.com/a-h/templ"
 	"github.com/aohorodnyk/mimeheader"
 )
+
+type SameSite int
+
+const (
+	SameSiteDefaultMode SameSite = iota + 1
+	SameSiteLaxMode
+	SameSiteStrictMode
+	SameSiteNoneMode
+)
+
+type Cookie struct {
+	Name        string
+	Value       string
+	Path        string    // опциональный параметр
+	Domain      string    // опциональный параметр
+	Expires     time.Time // опциональный параметр
+	MaxAge      int
+	Secure      bool
+	HttpOnly    bool
+	SameSite    SameSite
+	Partitioned bool
+}
 
 type Form interface {
 	FormValue(name string) string
@@ -37,6 +60,7 @@ type Request interface {
 	MultipartForm(maxMemory int64) (Form, error)
 	URLEncodedForm() (url.Values, error)
 	ReadData(data any) error
+	Cookie(name string) (string, error)
 }
 
 // Response универсальный интерфейс для HTTP-ответа

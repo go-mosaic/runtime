@@ -64,6 +64,32 @@ func (r *HTTPRequest) ReadData(data any) error {
 	return r.readData(r, data)
 }
 
+func (r *HTTPRequest) SetCookie(c transport.Cookie) error {
+	r.req.AddCookie(&http.Cookie{
+		Name:        c.Name,
+		Value:       c.Value,
+		Path:        c.Path,
+		Domain:      c.Domain,
+		Expires:     c.Expires,
+		MaxAge:      c.MaxAge,
+		Secure:      c.Secure,
+		HttpOnly:    c.HttpOnly,
+		SameSite:    http.SameSite(c.SameSite),
+		Partitioned: c.Partitioned,
+	})
+
+	return nil
+}
+
+func (r *HTTPRequest) Cookie(name string) (string, error) {
+	c, err := r.req.Cookie(name)
+	if err != nil {
+		return "", err
+	}
+
+	return c.Value, nil
+}
+
 // HTTPResponse адаптер для net/http.ResponseWriter
 type HTTPResponse struct {
 	w             http.ResponseWriter

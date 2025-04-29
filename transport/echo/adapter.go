@@ -3,6 +3,7 @@ package echo
 import (
 	"context"
 	"io"
+	"net/http"
 	"net/url"
 
 	"github.com/labstack/echo/v4"
@@ -65,6 +66,27 @@ func (r *EchoRequest) URLEncodedForm() (url.Values, error) {
 
 func (r *EchoRequest) ReadData(data any) error {
 	return r.readData(r, data)
+}
+
+func (r *EchoRequest) SetCookie(name, value string, maxAge int, path, domain string, secure, httpOnly bool) {
+	r.ctx.SetCookie(&http.Cookie{
+		Name:     name,
+		Value:    value,
+		MaxAge:   maxAge,
+		Path:     path,
+		Domain:   domain,
+		Secure:   secure,
+		HttpOnly: httpOnly,
+	})
+}
+
+func (r *EchoRequest) Cookie(name string) (string, error) {
+	c, err := r.ctx.Cookie(name)
+	if err != nil {
+		return "", err
+	}
+
+	return c.Value, nil
 }
 
 // EchoResponse адаптер для echo.Context
